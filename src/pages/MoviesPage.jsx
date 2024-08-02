@@ -21,10 +21,9 @@ const MoviesPage = () => {
         const responce = await axios("/search/movie", {
           params: { query: q, ...params },
         });
-        if (responce.data.results.lenght > 0) {
+        if (responce.data.results.length) {
           setSearchMovies(responce.data);
         } else toast.error("В базе данных найдено 0 записей");
-        console.log(responce.data);
       } catch (error) {
         console.log(error);
       }

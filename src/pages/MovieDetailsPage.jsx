@@ -1,6 +1,4 @@
 import { Link, useParams } from "react-router-dom";
-import MovieCast from "../components/MovieCast";
-import MovieReviews from "../components/MovieReviews";
 import { useEffect, useState } from "react";
 import axios from "axios";
 axios.defaults.baseURL = "https://api.themoviedb.org/3";
@@ -42,12 +40,14 @@ const MovieDetailsPage = () => {
         <h3>Genres:</h3>
         <p>{genres}</p>
       </div>
-      <Link to="movie-cast" element={<MovieCast />}>
-        Movie Cast
-      </Link>
-      <Link to="movie-reviews" element={<MovieReviews />}>
-        Movie Reviews
-      </Link>
+      <ul>
+        <li>
+          <Link to="cast">Movie Cast</Link>
+        </li>
+        <li>
+          <Link to="reviews">Movie Reviews</Link>
+        </li>
+      </ul>
     </div>
   );
 };

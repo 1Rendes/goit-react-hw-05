@@ -1,44 +1,29 @@
-import { Link, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { Link, Outlet, useParams } from "react-router-dom";
+import { Suspense } from "react";
 import axios from "axios";
+import { useFetch } from "../hooks/useFetch";
 axios.defaults.baseURL = "https://api.themoviedb.org/3";
 
 const MovieDetailsPage = () => {
   const { id } = useParams();
-  const [movieById, setMovieById] = useState("");
-  const [genres, setGenres] = useState("");
-  useEffect(() => {
-    const params = {
-      params: { language: "en-US" },
-      api_key: "a4235cfcff6946cc81f3ca1da1ed5af7",
-    };
-    async function fetchMovies(id) {
-      try {
-        const responce = await axios(`/movie/${id}`, { params });
-        setMovieById(responce.data);
-        const genres = responce.data.genres.map((genre) => genre.name);
-        const genresInString = genres.join(", ");
-        setGenres(genresInString);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    fetchMovies(id);
-  }, []);
+  const endpoint = `/movie/${id}`;
+  const { data, loading, error } = useFetch(endpoint);
 
   return (
-    <div>
+    <main>
       <div>
         <img
-          src={`https://image.tmdb.org/t/p/w500/${movieById.backdrop_path}`}
+          src={`https://image.tmdb.org/t/p/w500/${data.backdrop_path}`}
           alt=""
         />
-        <h2>{movieById.title}</h2>
-        <p>User score: {movieById.vote_average}</p>
+        <h2>{data.title}</h2>
+        <p>User score: {`${data.vote_average * 10}%`}</p>
         <h3>Overview:</h3>
-        <p>{movieById.overview}</p>
+        <p>{data.overview}</p>
         <h3>Genres:</h3>
-        <p>{genres}</p>
+        {data.genres && (
+          <p>{data.genres.map((genre) => genre.name).join(", ")}</p>
+        )}
       </div>
       <ul>
         <li>
@@ -48,7 +33,11 @@ const MovieDetailsPage = () => {
           <Link to="reviews">Movie Reviews</Link>
         </li>
       </ul>
-    </div>
+
+      <Suspense fallback={<div>Loading subpage...</div>}>
+        <Outlet />
+      </Suspense>
+    </main>
   );
 };
 

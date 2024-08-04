@@ -1,36 +1,13 @@
-import { Link } from "react-router-dom";
 import MovieList from "../components/MovieList";
-import MovieDetailsPage from "./MovieDetailsPage";
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
+import { useFetch } from "../hooks/useFetch";
 
 const MoviesPage = () => {
-  const [searchMovies, setSearchMovies] = useState("");
   const [query, setQuery] = useState("");
-  axios.defaults.baseURL = "https://api.themoviedb.org/3";
+  const endpoint = "/search/movie";
 
-  useEffect(() => {
-    if (!query) return;
-    const params = {
-      params: { language: "en-US" },
-      api_key: "a4235cfcff6946cc81f3ca1da1ed5af7",
-    };
-    async function fetchMovies(q) {
-      try {
-        const responce = await axios("/search/movie", {
-          params: { query: q, ...params },
-        });
-        if (responce.data.results.length) {
-          setSearchMovies(responce.data);
-        } else toast.error("В базе данных найдено 0 записей");
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    fetchMovies(query);
-  }, [query]);
-
+  const { data, loading, error } = useFetch(endpoint, query);
   const handleSubmit = (e) => {
     e.preventDefault();
     const form = e.target;
@@ -39,7 +16,7 @@ const MoviesPage = () => {
       toast.error("Please fill the request");
     } else setQuery(query);
   };
-
+  if (data.total_results === 0) toast.error("В базе данных найдено 0 записей");
   return (
     <div>
       <Toaster />
@@ -47,8 +24,8 @@ const MoviesPage = () => {
         <input type="text" name="query" />
         <button type="submit">find!</button>
       </form>
-      {searchMovies && (
-        <MovieList movieList={searchMovies}>MoviesPage</MovieList>
+      {data.results && (
+        <MovieList movieList={data.results}>MoviesPage</MovieList>
       )}
     </div>
   );

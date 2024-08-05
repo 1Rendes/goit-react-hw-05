@@ -1,23 +1,41 @@
-import { Link, Outlet, useParams } from "react-router-dom";
+import { Link, Outlet, useLocation, useParams } from "react-router-dom";
 import { Suspense } from "react";
 import axios from "axios";
 import { useFetch } from "../hooks/useFetch";
+import BackLinkButton from "../components/BackLinkButton";
+import toast, { Toaster } from "react-hot-toast";
+import placeholder from "../img/placeholder-image.webp";
 axios.defaults.baseURL = "https://api.themoviedb.org/3";
 
 const MovieDetailsPage = () => {
   const { id } = useParams();
   const endpoint = `/movie/${id}`;
   const { data, loading, error } = useFetch(endpoint);
+  const location = useLocation();
+  const backLink = location.state ?? "/movies";
+  error && toast.error(error);
 
   return (
     <main>
+      <Toaster />
       <div>
+        <BackLinkButton to={backLink} />
         <img
-          src={`https://image.tmdb.org/t/p/w500/${data.backdrop_path}`}
+          src={
+            data.backdrop_path
+              ? `https://image.tmdb.org/t/p/w500/${data.backdrop_path}`
+              : placeholder
+          }
           alt=""
         />
         <h2>{data.title}</h2>
-        <p>User score: {`${data.vote_average * 10}%`}</p>
+        <p>
+          <b>User score:</b> {`${data.vote_average * 10}%`}
+        </p>
+        <p>
+          <b>Release date:</b>{" "}
+          {data.release_date && data.release_date.split("-").join(".")}
+        </p>
         <h3>Overview:</h3>
         <p>{data.overview}</p>
         <h3>Genres:</h3>

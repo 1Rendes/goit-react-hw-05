@@ -1,14 +1,16 @@
 import MovieList from "../components/MovieList";
 import { useFetch } from "../hooks/useFetch";
 import toast, { Toaster } from "react-hot-toast";
+import css from "./HomePage.module.css";
 
 const HomePage = () => {
   const endpoint = "/trending/movie/day";
-  const { data, loading, error } = useFetch(endpoint);
+  const { data, error } = useFetch(endpoint);
+
   error && toast.error(error);
 
   return (
-    <div>
+    <div className={css.homePage}>
       <Toaster />
       Trendings today:
       {data.results && <MovieList movieList={data.results} />}
